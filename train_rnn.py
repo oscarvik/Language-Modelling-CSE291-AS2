@@ -127,7 +127,7 @@ def main(args):
                     step += 1
 
                 # bookkeepeing
-                tracker['Loss'] = torch.cat((tracker['Loss'], loss.data))
+                tracker['Loss'] = torch.cat((tracker['Loss'], loss.data.unsqueeze(0)))
 
                 if args.tensorboard_logging:
                     writer.add_scalar("%s/NLL_Loss"%split.upper(), NLL_loss.data[0]/batch_size, epoch*len(data_loader) + iteration)
