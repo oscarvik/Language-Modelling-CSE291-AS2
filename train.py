@@ -68,7 +68,7 @@ def main(args):
     save_model_path = os.path.join(args.save_model_path, ts)
     os.makedirs(save_model_path)
 
-    total_steps = len(datasets[split]) // args.batch_size
+    total_steps = len(datasets["train"]) // args.batch_size
     print("Train dataset size", total_steps)
 
     def kl_anneal_function(anneal_function, step):
@@ -76,10 +76,10 @@ def main(args):
             return 1
         if anneal_function == 'linear':
             if args.warmup is None:
-                return 1 - (total_steps - step)/total_steps
+                return 1 - (total_steps - step) / total_steps
             else:
-                warmup_steps = (total_steps/args.epochs) * args.warmup
-                return  1 - (warmup_steps - step)/warmup_steps if step < warmup_steps else 1.0
+                warmup_steps = (total_steps / args.epochs) * args.warmup
+                return 1 - (warmup_steps - step) / warmup_steps if step < warmup_steps else 1.0
 
     ReconLoss = torch.nn.NLLLoss(size_average=False, ignore_index=datasets['train'].pad_idx)
 
