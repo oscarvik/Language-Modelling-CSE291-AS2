@@ -182,6 +182,7 @@ if __name__ == '__main__':
     args.rnn_type = args.rnn_type.lower()
 
     assert args.rnn_type in ['rnn', 'lstm', 'gru']
+    print("using rnn_type: "+args.rnn_type)
     assert 0 <= args.word_dropout <= 1
 
     main(args)
