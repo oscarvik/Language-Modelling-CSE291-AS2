@@ -102,7 +102,7 @@ The following arguments are available:
 `-wd`, `--word_dropout` Word dropout applied to the input of the Decoder, which means words will be replaced by `<unk>` with a probability of `word_dropout`.  
 `-ed`, `--embedding_dropout` Word embedding dropout applied to the input of the Decoder.
 
-`-af`, `--anneal_function` Default is identity. You will need to implement other annealing methods if you would like to use KL annealing.
+`-af`, `--anneal_function` Default is identity. You will need to implement other annealing methods if you would like to use KL annealing.  
 `-wu`,`--warmup` Default is None, set number of epochs to do warmup (KL annealing)
 `-v`, `--print_every`  
 `-tb`, `--tensorboard_logging` If provided, training progress is monitored with tensorboard.  
