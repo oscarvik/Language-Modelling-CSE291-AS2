@@ -9,34 +9,37 @@ from nltk.tokenize import TweetTokenizer
 
 from utils import OrderedCounter
 
+
 class PTB(Dataset):
 
-    def __init__(self, data_dir, split, create_data, **kwargs):
-
+    def __init__(self, data_dir, split, create_data, stop=False, **kwargs):
         super().__init__()
+        if stop:
+            return
         self.data_dir = data_dir
         self.split = split
         self.max_sequence_length = kwargs.get('max_sequence_length', 50)
         self.min_occ = kwargs.get('min_occ', 3)
 
-        self.raw_data_path = os.path.join(data_dir, 'ptb.'+split+'.txt')
-        self.data_file = 'ptb.'+split+'.json'
+        self.raw_data_path = os.path.join(data_dir, 'ptb.' + split + '.txt')
+        self.data_file = 'ptb.' + split + '.json'
         self.vocab_file = 'ptb.vocab.json'
 
         if create_data:
-            print("Creating new %s ptb data."%split.upper())
+            print("Creating new %s ptb data." % split.upper())
             self._create_data()
 
         elif not os.path.exists(os.path.join(self.data_dir, self.data_file)):
-            print("%s preprocessed file not found at %s. Creating new."%(split.upper(), os.path.join(self.data_dir, self.data_file)))
+            print("%s preprocessed file not found at %s. Creating new." % (
+                split.upper(), os.path.join(self.data_dir, self.data_file)))
             self._create_data()
 
         else:
             self._load_data()
-
+            self.length = len(self.data)
 
     def __len__(self):
-        return len(self.data)
+        return self.length
 
     def __getitem__(self, idx):
         idx = str(idx)
@@ -44,7 +47,8 @@ class PTB(Dataset):
         return {
             'input': np.asarray(self.data[idx]['input']),
             'target': np.asarray(self.data[idx]['target']),
-            'length': self.data[idx]['length']
+            'length': self.data[idx]['length'],
+            'dataset': 0.
         }
 
     @property
@@ -72,7 +76,6 @@ class PTB(Dataset):
 
     def get_i2w(self):
         return self.i2w
-
 
     def _load_data(self, vocab=True):
 
@@ -102,20 +105,19 @@ class PTB(Dataset):
         with open(self.raw_data_path, 'r') as file:
 
             for i, line in enumerate(file):
-
                 words = tokenizer.tokenize(line)
 
                 input = ['<sos>'] + words
                 input = input[:self.max_sequence_length]
 
-                target = words[:self.max_sequence_length-1]
+                target = words[:self.max_sequence_length - 1]
                 target = target + ['<eos>']
 
-                assert len(input) == len(target), "%i, %i"%(len(input), len(target))
+                assert len(input) == len(target), "%i, %i" % (len(input), len(target))
                 length = len(input)
 
-                input.extend(['<pad>'] * (self.max_sequence_length-length))
-                target.extend(['<pad>'] * (self.max_sequence_length-length))
+                input.extend(['<pad>'] * (self.max_sequence_length - length))
+                target.extend(['<pad>'] * (self.max_sequence_length - length))
 
                 input = [self.w2i.get(w, self.w2i['<unk>']) for w in input]
                 target = [self.w2i.get(w, self.w2i['<unk>']) for w in target]
@@ -159,7 +161,7 @@ class PTB(Dataset):
 
         assert len(w2i) == len(i2w)
 
-        print("Vocablurary of %i keys created." %len(w2i))
+        print("Vocablurary of %i keys created." % len(w2i))
 
         vocab = dict(w2i=w2i, i2w=i2w)
         with io.open(os.path.join(self.data_dir, self.vocab_file), 'wb') as vocab_file:
@@ -167,3 +169,63 @@ class PTB(Dataset):
             vocab_file.write(data.encode('utf8', 'replace'))
 
         self._load_vocab()
+
+    def newlength(self, end_length):
+        self.length = end_length
+
+
+class Brown(PTB):
+    def __init__(self, data_dir, split, create_data, **kwargs):
+        super().__init__(data_dir, split, create_data, stop=True, **kwargs)
+        self.data_dir = data_dir
+        self.split = split
+        self.max_sequence_length = kwargs.get('max_sequence_length', 50)
+        self.min_occ = kwargs.get('min_occ', 3)
+
+        self.raw_data_path = os.path.join(data_dir, 'brown/brown.' + split + '.txt')
+        self.data_file = 'brown/brown.' + split + '.json'
+        self.vocab_file = 'ptb.vocab.json'
+
+        if create_data:
+            print("Creating new %s ptb data." % split.upper())
+            self._create_data()
+
+        elif not os.path.exists(os.path.join(self.data_dir, self.data_file)):
+            print("%s preprocessed file not found at %s. Creating new." % (
+                split.upper(), os.path.join(self.data_dir, self.data_file)))
+            self._create_data()
+
+        else:
+            self._load_data()
+            self.length = len(self.data)
+
+    def __getitem__(self, idx):
+        idx = str(idx)
+        return {
+            'input': np.asarray(self.data[idx]['input']),
+            'target': np.asarray(self.data[idx]['target']),
+            'length': self.data[idx]['length'],
+            'dataset': 1.
+        }
+
+# from torch.utils.data import DataLoader
+
+# data = Brown(
+#    data_dir="data",
+#    split="valid",
+#    create_data=False,
+#    max_sequence_length=60,
+#    min_occ=1
+# )
+
+# data_loader = DataLoader(
+#    dataset=data,
+#    batch_size=32,
+#    shuffle=True,
+#    num_workers=1,
+#    pin_memory=False
+# )
+
+# for iteration, batch in enumerate(data_loader):
+#    print(batch)
+#    break

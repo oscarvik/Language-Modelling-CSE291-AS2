@@ -55,6 +55,7 @@ def main(args):
         )
 
     if torch.cuda.is_available():
+        print("Using CUDA")
         model = model.cuda()
 
     print(model)

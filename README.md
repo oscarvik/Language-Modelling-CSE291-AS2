@@ -9,14 +9,15 @@ Materials borrowed from https://github.com/timbmg/: PyTorch re-implementation of
 ```
 conda create -n cse291_as2 python=3.6
 ```
-3. Install requirements.
-```
-pip install -r requirements.txt
-```
-4. Activate the environment.
+3. Activate the environment.
 ```
 conda activate cse291_as2
 ```
+4. Install requirements.
+```
+pip install -r requirements.txt
+```
+
 
 ## Download dataset
 To run the training, please download the Penn Tree Bank data first (download from [Tomas Mikolov's webpage](http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz)). The code expects to find at least `ptb.train.txt` and `ptb.valid.txt` in the specified data directory. The data can also be donwloaded with the `dowloaddata.sh` script.
@@ -102,7 +103,7 @@ The following arguments are available:
 `-ed`, `--embedding_dropout` Word embedding dropout applied to the input of the Decoder.
 
 `-af`, `--anneal_function` Default is identity. You will need to implement other annealing methods if you would like to use KL annealing.
-
+`-wu`,`--warmup` Default is None, set number of epochs to do warmup (KL annealing)
 `-v`, `--print_every`  
 `-tb`, `--tensorboard_logging` If provided, training progress is monitored with tensorboard.  
 `-log`, `--logdir` Directory of log files for tensorboard.  
