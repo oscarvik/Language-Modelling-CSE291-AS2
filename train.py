@@ -68,7 +68,7 @@ def main(args):
     save_model_path = os.path.join(args.save_model_path, ts)
     os.makedirs(save_model_path)
 
-    total_steps = len(datasets["train"]) // args.batch_size
+    total_steps = (len(datasets["train"]) // args.batch_size) * args.epochs
     print("Train dataset size", total_steps)
 
     def kl_anneal_function(anneal_function, step):
