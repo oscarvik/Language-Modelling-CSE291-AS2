@@ -196,15 +196,17 @@ def main(args):
                 logger.info("Model saved at %s" % checkpoint_path)
 
     if args.num_samples:
-        print(f"Generating {args.num_samples} samples")
+        torch.cuda.empty_cache()
         model.eval()
-        generations, _ = model.inference(n=args.num_samples)
-        vocab = datasets["train"].i2w
+        with torch.no_grad():
+            print(f"Generating {args.num_samples} samples")
+            generations, _ = model.inference(n=args.num_samples)
+            vocab = datasets["train"].i2w
 
-        print("Sampled latent codes from z ~ N(0, I), generated sentences:")
-        for i, generation in enumerate(generations, start=1):
-            sentence = [vocab[str(word.item())] for word in generation]
-            print(f"{i}:", " ".join(sentence))
+            print("Sampled latent codes from z ~ N(0, I), generated sentences:")
+            for i, generation in enumerate(generations, start=1):
+                sentence = [vocab[str(word.item())] for word in generation]
+                print(f"{i}:", " ".join(sentence))
 
 
 if __name__ == '__main__':
