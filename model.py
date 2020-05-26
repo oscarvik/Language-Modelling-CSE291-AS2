@@ -170,7 +170,7 @@ class SentenceVAE(nn.Module):
             running_seqs = running_seqs.masked_select(running_mask)
 
             # prune input and hidden state according to local update
-            if batch_size == 1:
+            if batch_size == 1 or len(input_sequence.size()) == 0:
                 input_sequence = input_sequence.unsqueeze(0)
             if len(running_seqs) > 0:
                 input_sequence = input_sequence[running_seqs]
