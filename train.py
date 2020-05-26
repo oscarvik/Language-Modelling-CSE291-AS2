@@ -195,17 +195,26 @@ def main(args):
                 torch.save(model.state_dict(), checkpoint_path)
                 logger.info("Model saved at %s" % checkpoint_path)
 
+    if args.num_samples:
+        generations, _ = model.inference(n=args.num_samples)
+        vocab = datasets["train"].i2w
+
+        print("Sampled latent codes from z ~ N(0, I), generated sentences:")
+        for i, generation in enumerate(generations, start=1):
+            sentence = [vocab[str(word.item())] for word in generation]
+            print(f"{i}:", " ".join(sentence))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-
+    parser.add_argument('--num_samples', type=int, default=10)
     parser.add_argument('--data_dir', type=str, default='data')
     parser.add_argument('--create_data', action='store_true')
     parser.add_argument('--max_sequence_length', type=int, default=60)
     parser.add_argument('--min_occ', type=int, default=1)
     parser.add_argument('--test', action='store_true')
 
-    parser.add_argument('-ep', '--epochs', type=int, default=10)
+    parser.add_argument('-ep', '--epochs', type=int, default=0)
     parser.add_argument('-bs', '--batch_size', type=int, default=32)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.001)
 
