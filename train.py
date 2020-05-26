@@ -154,7 +154,8 @@ def main(args):
                 tracker['negELBO'] = torch.cat((tracker['negELBO'], loss.data.unsqueeze(0)))
 
                 if args.tensorboard_logging:
-                    writer.add_scalar("%s/Negative_ELBO" % split.upper(), loss.data[0],
+                    neg_elbo = (recon_loss + KL_loss) / batch_size
+                    writer.add_scalar("%s/Negative_ELBO" % split.upper(), neg_elbo.data[0],
                                       epoch * len(data_loader) + iteration)
                     writer.add_scalar("%s/Recon_Loss" % split.upper(), recon_loss.data[0] / batch_size,
                                       epoch * len(data_loader) + iteration)
